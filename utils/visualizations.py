@@ -1,0 +1,78 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def create_subplots(rows, columns, figsize=(18,12)):
+    """Creates a figure and subplots with common settings."""
+    fig, ax = plt.subplots(rows, columns, figsize=figsize)
+    ax = ax.ravel()
+    return fig, ax
+
+def plot_columns(data, cols, plot_func, ax, title_prefix="", x=None):
+    """Plots specified columns using the given plotting function
+    """
+    for i, col in enumerate(cols):
+        if plot_func == sns.boxplot:
+            plot_func(y=data[col], x=data["target"], hue=data["target"], ax=ax[i], legend=False)
+        elif plot_func == sns.histplot:
+            plot_func(data[col], ax=ax[i], kde=True)
+        elif plot_func == sns.scatterplot and x is not None:
+            plot_func(y=data[col], x=data[x], hue=data["failure_type"], ax=ax[i])
+        else:
+            plot_func(x=data[col], ax=ax[i])
+        ax[i].set_title(f"{title_prefix}{col.capitalize()}")
+
+def remove_unused_axes(fig, ax, num_plots):
+    """Removes unused axes from a figure."""
+    total_axes = len(ax)
+    for j in range(num_plots, total_axes):
+        fig.delaxes(ax[j])
+
+def numerical_univariate_analysis(data, rows, columns):
+    """Performs univariate analysis on numerical columns."""
+    fig, ax = create_subplots(rows, columns)
+    cols = data.select_dtypes(include="number")
+    plot_columns(data, cols, sns.histplot, ax, title_prefix="Distribution of ")
+    remove_unused_axes(fig, ax, cols.shape[1])
+    plt.tight_layout()
+    plt.show()
+
+
+def categorical_univariate_analysis(data, rows, columns):
+    """Performs univariate analysis on categorical columns."""
+    fig, ax = create_subplots(rows, columns)
+    cols = data.select_dtypes(include="object")
+    plot_columns(data, cols, sns.countplot, ax)
+    remove_unused_axes(fig, ax, cols.shape[1])
+    plt.tight_layout()
+    plt.show()
+
+def features_vs_targets(data, rows, columns):
+    """Plots numerical features against the target variable."""
+    fig, ax = create_subplots(rows, columns, figsize=(18, 12))
+    cols = data.drop(columns=["target"]).select_dtypes(include="number")
+    plot_columns(data, cols, sns.boxplot, ax, "Target x ")
+    remove_unused_axes(fig, ax, cols.shape[1])
+    plt.tight_layout()
+    plt.show()
+    plt.figure(figsize=(19, 6))
+    sns.countplot(data=data, x="type", hue="target")
+    plt.title("Target x Type")
+    plt.tight_layout()
+    plt.show()
+
+def facegrid_hist_target(df, facecol, color):
+    for col in df.drop(columns=["target"]).select_dtypes(include="number"):
+        g = sns.FacetGrid(df[df["target"]==1], col=facecol)
+        g.map(sns.histplot, col, color=color)
+        plt.show()
+
+def plot_scatter_numericals_target(data, rows, columns, x):
+    """Plots scatter plots of numerical columns against tool_wear,
+       optionally filtering by target value.
+    """
+    fig, ax = create_subplots(rows, columns, figsize=(18, 12))
+    cols = data.drop(columns=["target", x]).select_dtypes(include='number')
+    plot_columns(data[data["target"] == 1], cols, sns.scatterplot, ax, f"{x.capitalize()} x ", x=x)
+    remove_unused_axes(fig, ax, cols.shape[1])
+    plt.tight_layout()
+    plt.show()
