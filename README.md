@@ -37,3 +37,11 @@ From the exploratory data analysis, these were the main points that stood out:
 - The `air_temperature` and `tool_wear` columns present a very similar behavior, with the majority of failures appearing when they have high values
 - `Rotational_speed` and `torque` present opposite behaviors. Failures are very concentrated when `rotational_speed` indicates a low value and, when `torque` indicates high values
 - There are two types of failures that only occurs when the rotational speed is below 1500 rpm, with the heat dissipation failure completely dependent on the temperatures and the overstrain failure dependent on high `torque` and high `tool_wear`
+
+## Engineered Features
+From the knowledge gained during the EDA, the following features were created:
+- `temp_diff`: This feature can help detect all failures that occur when the temperatures are high, especialy everytime that theres a heat dissipation failure
+- `power`: This feature can help detect all power failures
+
+Another thing was the creation of two extra datasets, one containing all original and new features and another containing only the new features and some of the originals. All three datasets will be used to make sure that the best possible model is found, both in terms of metrics and process time
+
