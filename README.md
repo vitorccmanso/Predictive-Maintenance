@@ -33,7 +33,7 @@ To achieve this objective, it was further broken down into the following technic
 
 ## Main Insights
 From the exploratory data analysis, these were the main points that stood out:
-- The target column is extremely unbalanced, with more than 96% of all data on the "no failure" class, determined by the 0
-- The air_temperature and tool_wear columns present a very similar behavior, with the majority of failures appearing when they have high values
-- Rotational_speed and torque present opposite behaviors. Failures are very concentrated when the rotational_speed indicates a low value and, on the torque column, when it indicates high values
-- There are two types of failures that only occurs when the rotational speed is below 1500 rpm, with the heat dissipation failure completely dependent on the temperatures and the overstrain failure dependent on high torque and high tool wear
+- The `target` column is extremely unbalanced, with more than 96% of all data on the "no failure" class, determined by the 0
+- The `air_temperature` and `tool_wear` columns present a very similar behavior, with the majority of failures appearing when they have high values
+- `Rotational_speed` and `torque` present opposite behaviors. Failures are very concentrated when `rotational_speed` indicates a low value and, when `torque` indicates high values
+- There are two types of failures that only occurs when the rotational speed is below 1500 rpm, with the heat dissipation failure completely dependent on the temperatures and the overstrain failure dependent on high `torque` and high `tool_wear`
