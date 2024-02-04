@@ -4,10 +4,12 @@ import seaborn as sns
 def create_subplots(rows, columns, figsize=(18,12)):
     """
     Creates a figure and subplots with common settings
+
     Parameters:
     - rows: Number of rows in the subplot grid
     - columns: Number of columns in the subplot grid
     - figsize: Tuple specifying the width and height of the figure (default is (18, 12))
+    
     Returns:
     - fig: The Matplotlib figure object
     - ax: A 1D NumPy array of Matplotlib axes
@@ -19,6 +21,7 @@ def create_subplots(rows, columns, figsize=(18,12)):
 def plot_columns(data, cols, plot_func, ax, title_prefix="", x=None):
     """
     Plots specified graphs using the given plotting function
+
     Parameters:
     - data: DataFrame containing the data to be plotted
     - cols: List of column names to be plotted
@@ -41,6 +44,7 @@ def plot_columns(data, cols, plot_func, ax, title_prefix="", x=None):
 def remove_unused_axes(fig, ax, num_plots):
     """
     Removes unused axes from a figure
+
     Parameters:
     - fig: The Matplotlib figure object
     - ax: A 1D NumPy array of Matplotlib axes
@@ -53,10 +57,12 @@ def remove_unused_axes(fig, ax, num_plots):
 def numerical_univariate_analysis(data, rows, columns):
     """
     Performs univariate analysis on numerical columns
+
     Parameters:
     - data: DataFrame containing numerical data for analysis
     - rows: Number of rows in the subplot grid
     - columns: Number of columns in the subplot grid
+
     Effect:
     - Plots the distribution of numerical columns using seaborn's histplot
     """
@@ -71,10 +77,12 @@ def numerical_univariate_analysis(data, rows, columns):
 def categorical_univariate_analysis(data, rows, columns):
     """
     Performs univariate analysis on categorical columns
+
     Parameters:
     - data: DataFrame containing categorical data for analysis
     - rows: Number of rows in the subplot grid
     - columns: Number of columns in the subplot grid
+
     Effect:
     - Plots countplots for each categorical column
     """
@@ -88,10 +96,12 @@ def categorical_univariate_analysis(data, rows, columns):
 def features_vs_targets(data, rows, columns):
     """
     Plots numerical features against the target variable
+
     Parameters:
     - data: DataFrame containing both features and target variable
     - rows: Number of rows in the subplot grid
     - columns: Number of columns in the subplot grid
+
     Effect:
     - Plots boxplots for numerical features against the target variable
     - Plots a countplot for the target variable against the 'type' column
@@ -111,10 +121,12 @@ def features_vs_targets(data, rows, columns):
 def facegrid_hist_target(df, facecol, color):
     """
     Generates FacetGrid histograms for numerical columns based on target values
+
     Parameters:
     - df: DataFrame containing data for analysis
     - facecol: Column for creating facets in the FacetGrid
     - color: Color for the histograms
+
     Effect:
     - Creates a FacetGrid for each column based on the unique values in the specified facecol
     - Filters the data to include only rows where the "target" column is equal to 1
@@ -128,11 +140,13 @@ def facegrid_hist_target(df, facecol, color):
 def plot_scatter_numericals_target(data, rows, columns, x):
     """
     Plots scatter plots of numerical columns against x column for target value 1
+
     Parameters:
     - data: DataFrame containing data for analysis
     - rows: Number of rows in the subplot grid
     - columns: Number of columns in the subplot grid
     - x: Column for the x-axis in scatter plots
+
     Effect:
     - Plots scatter plots using seaborn's scatterplot for each numerical column against x column
     """
