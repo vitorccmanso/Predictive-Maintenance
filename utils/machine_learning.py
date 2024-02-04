@@ -53,7 +53,7 @@ def evaluate_models(X_train, y_train, X_test, y_test, models, params, experiment
         with mlflow.start_run():
             param = params[model_name]
             
-            gs = GridSearchCV(model, param, cv=3, scoring='roc_auc')
+            gs = GridSearchCV(model, param, cv=5, scoring=['roc_auc', 'recall'], refit="recall")
             gs.fit(X_train, y_train)
             
             model.set_params(**gs.best_params_)
@@ -73,8 +73,8 @@ def evaluate_models(X_train, y_train, X_test, y_test, models, params, experiment
             mlflow.log_metric("recall_score", recall)
             
             # Log the model to DAGsHub
-            with dagshub_logger() as logger:
-                logger.log_model(model=model, metrics={"f1_score": f1, "roc_auc_score": roc_auc, "recall_score": recall})
+            # with dagshub_logger() as logger:
+            #     logger.log_model(model=model, metrics={"f1_score": f1, "roc_auc_score": roc_auc, "recall_score": recall})
             
             # Store the model and predictions for visualization
             report[model_name] = {"f1_score": f1, "roc_auc_score": roc_auc, "recall_score": recall, "model": model, "y_test_pred": y_test_pred}
@@ -98,11 +98,11 @@ def visualize_roc_curves(y_test, models):
     plt.legend()
     plt.show()
 
-def visualize_confusion_matrix(y_test, model_name, models):
+def visualize_confusion_matrix(y_test, X_test, model_name, models, experiment_name):
     plt.figure(figsize=(12, 5))
     
     # Find the best model's parameters logged in MLflow
-    best_params = get_best_params_from_mlflow(model_name)
+    best_params = get_best_params_from_mlflow(model_name, experiment_name)
     
     # Get the best model using the found parameters
     best_model = models[model_name]["model"]
@@ -129,19 +129,13 @@ def visualize_confusion_matrix(y_test, model_name, models):
     plt.tight_layout()
     plt.show()
 
-def get_best_params_from_mlflow(model_name):
+def get_best_params_from_mlflow(model_name, experiment_name):
     # Fetch best parameters from MLflow
     run = mlflow.search_runs(experiment_ids=mlflow.get_experiment_by_name(experiment_name).experiment_id, filter_string=f'metrics.model={model_name}').iloc[0]
     best_params = run['params']
     return best_params
 
-# Sample data (replace with your actual data)
-X_train, X_test, y_train, y_test = ...
-
-# Modify the experiment name as needed
-experiment_name = "Your_Experiment_Name"
-
-def initiate_model_trainer(train_test: tuple):
+def initiate_model_trainer(train_test: tuple, experiment_name):
     X_train, y_train, X_test, y_test = train_test
     
     models = {
@@ -153,7 +147,8 @@ def initiate_model_trainer(train_test: tuple):
     
     params = {
         "Logistic Regression": {
-            "solver": "liblinear",
+            "solver": ["liblinear", "lbfgs"],
+            'class_weight': ['balanced', None],
             'penalty':['l2', 'l1', None], 
             'C':[1.5,1,0.5,0.01]
         },
