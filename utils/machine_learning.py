@@ -69,21 +69,19 @@ def initiate_model_trainer(train_test: tuple, experiment_name, use_smote=False):
     params = {
         "Logistic Regression": {
             "solver": ["liblinear", "lbfgs"],
-            "penalty":["l2", "l1", None], 
+            "penalty":["l2", "l1", "elasticnet", None], 
             "C":[1.5, 1, 0.5, 0.1]
         },
         "Random Forest":{
             "criterion":["gini", "entropy", "log_loss"],
-            "max_features":["sqrt","log2", None],
-            "n_estimators": [8, 16, 32, 64, 128],
-            "max_depth": [3, 5, 8, 10],
-            "min_samples_split": [2, 5, 8],
-            "min_samples_leaf": [1, 3, 5]
+            "max_features":["sqrt","log2"],
+            "n_estimators": [5,10,25,50,100],
+            "max_depth": [5, 10, 20, 30, 50]
         },
         "KNN":{
             "metric": ["minkowski", "chebyshev"],
-            "n_neighbors": [3, 5, 7],
-            "p": [1, 2, 3]
+            "n_neighbors": [3, 5, 7, 9],
+            "p": [1, 2, 3, 4]
         }
     }
     
@@ -96,7 +94,7 @@ def evaluate_models(X_train, y_train, X_test, y_test, models, params, experiment
     report = {}
     if use_smote:
         # Apply SMOTE to the training data
-        smote = SMOTE(sampling_strategy="auto")
+        smote = SMOTE()
         X_train, y_train = smote.fit_resample(X_train, y_train)
     for model_name, model in models.items():
         with mlflow.start_run(run_name=model_name):
