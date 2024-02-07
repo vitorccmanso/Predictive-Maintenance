@@ -43,7 +43,10 @@ From the exploratory data analysis, these were the main points that stood out:
 ![Rot_Speed X Torque](images/rotspeed_torque.png)
 
 - There are two types of failures that only occurs when the rotational speed is below 1500 rpm, with the **heat dissipation** failure completely dependent on the temperatures and the **overstrain** failure dependent on high `torque` and high `tool_wear`
-![Heat Dependence](images/heat_temp_rotspeed.png)        ![Overstrain Dependence](images/overstrain_wear_rotspeed.png)
+
+![Heat Dependence](images/heat_temp_rotspeed.png)  
+
+![Overstrain Dependence](images/overstrain_wear_rotspeed.png)
 
 ## Engineered Features
 From the knowledge gained during the EDA, the following features were created:
