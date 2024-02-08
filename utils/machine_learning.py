@@ -1,4 +1,3 @@
-import configparser
 import os
 import pandas as pd
 import numpy as np
@@ -16,15 +15,8 @@ from sklearn.metrics import f1_score, roc_auc_score, recall_score, roc_curve, co
 from sklearn.inspection import permutation_importance
 from utils.visualizations import create_subplots
 
-config = configparser.ConfigParser()
-config.read("../mlflow_config.ini")
-
-mlflow_tracking_username = config['mlflow']['tracking_username']
-mlflow_tracking_password = config['mlflow']['tracking_password']
-
-# Set environment variables
-os.environ["MLFLOW_TRACKING_USERNAME"] = mlflow_tracking_username
-os.environ["MLFLOW_TRACKING_PASSWORD"] = mlflow_tracking_password
+mlflow_tracking_username = os.environ.get("MLFLOW_TRACKING_USERNAME")
+mlflow_tracking_password = os.environ.get("MLFLOW_TRACKING_PASSWORD")
 
 class ModelTraining:
     """

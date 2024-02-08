@@ -3,17 +3,10 @@ import mlflow
 import os
 from sklearn.preprocessing import RobustScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
-import configparser
 
-config = configparser.ConfigParser()
-config.read("../Pred Maintenance/mlflow_config.ini")
+mlflow_tracking_username = os.environ.get("MLFLOW_TRACKING_USERNAME")
+mlflow_tracking_password = os.environ.get("MLFLOW_TRACKING_PASSWORD")
 
-mlflow_tracking_username = config['mlflow']['tracking_username']
-mlflow_tracking_password = config['mlflow']['tracking_password']
-
-# Set environment variables
-os.environ["MLFLOW_TRACKING_USERNAME"] = mlflow_tracking_username
-os.environ["MLFLOW_TRACKING_PASSWORD"] = mlflow_tracking_password
 uri = "https://dagshub.com/vitorccmanso/Predictive-Maintenance.mlflow"
 
 class PredictPipeline:
