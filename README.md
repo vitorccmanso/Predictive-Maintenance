@@ -35,10 +35,18 @@ To achieve this objective, it was further broken down into the following technic
 From the exploratory data analysis, these were the main points that stood out:
 - The `target` column is extremely unbalanced, with more than 96% of all data on the "no failure" class, determined by the 0
 - The **heat dissipation** failure is concentrated where `air_temperature` and `process_temperature` indicates high values
+  
 ![Heat Failures](images/air_process_temp.png)
+
 - `Rotational_speed` and `torque` present opposite behaviors. Failures are very concentrated when `rotational_speed` indicates a low value and, when `torque` indicates high values
+  
 ![Rot_Speed X Torque](images/rotspeed_torque.png)
+
 - There are two types of failures that only occurs when the rotational speed is below 1500 rpm, with the **heat dissipation** failure completely dependent on the temperatures and the **overstrain** failure dependent on high `torque` and high `tool_wear`
+
+![Heat Dependence](images/heat_temp_rotspeed.png)  
+
+![Overstrain Dependence](images/overstrain_wear_rotspeed.png)
 
 ## Engineered Features
 From the knowledge gained during the EDA, the following features were created:
@@ -50,26 +58,34 @@ From the knowledge gained during the EDA, the following features were created:
 ### Model performance
 For the modeling phase, three models were used: Logistic Regression, Random Forest and KNN. Each model was trained and tested using the original dataset and the new dataset that contains the new engineered features. During each training and testing, two methods were used to solve the imbalance issue of the target. The first one was using the parameter `class_weight` on the models that have it. The second method was the utilization of `SMOTE`, an oversampling method that uses synthetic data to balance the target. `SMOTE` was only applied to the training sets, with the tests sets having the original imbalance of the data.
 Since this is a binary classification problem, the models were evaluated by their `AUC` score, and by the `recall` and `f1` metrics, with `recall` being the most important. The best performing model was the **Random Forest** when trained with the new features and using the `class_weight` parameter. 
+
 ![ROC AUC Scores](images/roc_curves.png)
+
 The **Random Forest** had a much superior score, at 0.938, way ahead of the other models.
 
 ### Model Explainability
+
 ![Features Importance](images/feature_importance.png)
+
 The **Random Forest** had a well balanced feature importance distribution in terms of decay in recall. The new features are tied for second and third place, with only `rotational_speed` being considered more important and `tool_wear` in fourth place. This means that the feature engineering effort was successful.
 
 ## Model Selection
 
 Despite having a very good `AUC` score, the model showed that by changing its threshold, it could get a better performance in terms of `f1`.
+
 ![Thresholds](images/threshold.png)
+
 By changing the threshold to 0.6, there would be minimal `recall` loss and a very big gain on `precision`. 
+
 ![Matrix](images/confusion_matrix.png)
+
 When adjusting the threshold, the model had only 15 false negatives and 19 false positives, for a total of 34 errors. The second best model had fewer false negatives (11), but 35 false positives. Assuming that the best financial outcome for the company is a model that has the least possible number of false negatives but don't want to keep sending machines for maintenance on false alarms (high number of false positives), this model was selected for deployment. The model parameters are:
 ```json
 {
     class_weight: "balanced",
     criterion: "entropy",
     max_depth: 5,
-    max_features: "	sqrt",
+    max_features: "sqrt",
     n_estimators: 50,
     random_state: 42
 }
