@@ -1,4 +1,4 @@
-# Machine Predictive Maintenance Binary Classification
+# [Machine Predictive Maintenance Binary Classification](https://predmaintenanceapp.azurewebsites.net)
 
 ![project header](images/header.png)
 
@@ -90,5 +90,39 @@ When adjusting the threshold, the model had only 15 false negatives and 19 false
     random_state: 42
 }
 ```
+## App Usage
 
+The easiest way to use the app is by accessing this link: <https://predmaintenanceapp.azurewebsites.net>
+However, since the deployment was made with the free plan from Azure, which only gives 60min of usage per day, the other way is through a Docker image. Here is a step by step guide on how to create this image and how to run the app locally:
 
+### Step 1: Build Docker Image
+
+The easiest way to build and run a docker image is with Docker Desktop. It can be downloaded [here](https://www.docker.com/products/docker-desktop/).
+Clone the repository and go to the folder with the Dockerfile. Then, run the following command to build the image:
+
+```shell
+docker build -t pred_maintenance_app:latest .
+```
+
+To check if the image was created successfully, run `docker images` in your CLI and you should see `pred_maintenance_app` listed.
+
+### Step 2: Run Docker Image
+
+In the same CLI, run the following command to run the image:
+
+```shell
+docker run -p 80:80 pred_maintenance_app:latest
+```
+
+You should see something like this:
+
+```shell
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+```
+
+### Step 3: Use the app
+
+Open a web browser page and type `localhost` in the search bar. This app should load and be ready for usage. Use the datasets in the folder `Data for app usage` to test the `Predict with Dataset` function, or create your dataset based on the original data. Or, explore the `Predict with Manual Data` function, to manually input a row of data for the model to predict.
