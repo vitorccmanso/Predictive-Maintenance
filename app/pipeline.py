@@ -1,8 +1,6 @@
 import pandas as pd
 import mlflow
-import os
-from sklearn.preprocessing import RobustScaler, OneHotEncoder
-from sklearn.compose import ColumnTransformer
+import pickle
 
 uri = "https://dagshub.com/vitorccmanso/Predictive-Maintenance.mlflow"
 
@@ -58,7 +56,7 @@ class PredictPipeline:
         reordered_data = filtered_data.reindex(columns=columns)
         return reordered_data
 
-    def preprocess_data(self, data, manual):
+    def preprocess_data(self, data):#, manual):
         """
         Preprocesses the input data by scaling numerical features and encoding categorical features
 
@@ -69,22 +67,14 @@ class PredictPipeline:
         Returns:
         - pd.DataFrame: The preprocessed data
         """
-        if manual:
-            data_scale = pd.read_csv("app/Scale_Data/data_scale.csv")
-            data = pd.concat([data, data_scale], axis=0)
         data['power'] = data['torque'] * data['rotational_speed']
         data['diference_temperature'] = data['air_temperature'] - data['process_temperature']
-        nums = data.select_dtypes("number").columns
-        cats = data.select_dtypes("object").columns
-        preprocessor = ColumnTransformer(
-            transformers=[
-                ('num', RobustScaler(), nums), 
-                ('cat', OneHotEncoder(categories=[["H", "L", "M"]]), cats) 
-            ], verbose_feature_names_out=False)
-        data = preprocessor.fit_transform(data)
+        preprocessor_path = 'app/artifacts/preprocessor.pkl'
+        # Load the preprocessor from the pkl file
+        with open(preprocessor_path, 'rb') as f:
+            preprocessor = pickle.load(f)
+        data = preprocessor.transform(data)
         new_data = pd.DataFrame(data, columns=preprocessor.get_feature_names_out())
-        if manual:
-            return new_data.head(1)
         return new_data
 
     def predict(self, data, manual=False):
@@ -98,7 +88,7 @@ class PredictPipeline:
         Returns:
         - Union[str, List[str]]: The predicted class or classes
         """
-        preds_proba = self.loaded_model.predict_proba(self.preprocess_data(data, manual))[:,1]
+        preds_proba = self.loaded_model.predict_proba(self.preprocess_data(data))[:,1]
         preds = (preds_proba >= 0.6).astype(int)
         prediction_classes = ["Healthy", "Needs Maintenance"]
         if manual:

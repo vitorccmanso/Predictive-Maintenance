@@ -14,6 +14,7 @@ from imblearn.over_sampling import SMOTE
 from sklearn.metrics import f1_score, roc_auc_score, recall_score, roc_curve, confusion_matrix, precision_score, accuracy_score, precision_recall_curve, precision_recall_fscore_support
 from sklearn.inspection import permutation_importance
 from utils.visualizations import create_subplots
+import pickle
 
 mlflow_tracking_username = os.environ.get("MLFLOW_TRACKING_USERNAME")
 mlflow_tracking_password = os.environ.get("MLFLOW_TRACKING_PASSWORD")
@@ -25,7 +26,19 @@ class ModelTraining:
     def __init__(self):
         pass
 
-    def preprocess_data(self, data, test_size:float, target_name:str):
+    def save_preprocessor(self, preprocessor):
+        """
+        Saves the preprocessor object to a pickle (pkl) file
+
+        Parameters:
+        - preprocessor: The preprocessor object to be saved
+        """
+        if not os.path.exists("artifacts"):
+            os.makedirs("artifacts")
+        with open('artifacts/preprocessor.pkl', 'wb') as f:
+            pickle.dump(preprocessor, f)
+
+    def preprocess_data(self, data, test_size:float, target_name:str, original=False):
         """
         Preprocesses data by splitting it into train and test sets and performs one-hot encoding on categorical columns,
         and scales numerical columns
@@ -34,31 +47,31 @@ class ModelTraining:
         - data: Input DataFrame
         - test_size: Proportion of data to be used for the test set
         - target_name: Name of the target variable column
+        - original: If the dataset used is the original one or not
 
         Returns:
-        - tuple: (X_train_preprocessed, X_test_preprocessed, y_train, y_test)
+        - tuple: (X_train, X_test, y_train, y_test)
         """
-        X = data.drop(columns=[target_name])
-        y = data[target_name]
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42, stratify=y, shuffle=True)
-
         # Define numerical and categorical columns and create a preprocessor
-        cat_columns = list(X_train.select_dtypes("object").columns)
-        num_columns = list(X_train.select_dtypes(exclude=["object"]).columns)
-        numerical_transformer = RobustScaler()
-        categorical_transformer = OneHotEncoder()
-
-        preprocessor = ColumnTransformer(transformers=[("num", numerical_transformer, num_columns), 
-                                        ("cat", categorical_transformer, cat_columns)], 
-                                        verbose_feature_names_out=False)
-
+        data_process = data.drop(columns=[target_name])
+        if original == True:
+            data_process['power'] = data_process['torque'] * data_process['rotational_speed']
+            data_process['diference_temperature'] = data_process['air_temperature'] - data_process['process_temperature']
+        nums = data_process.select_dtypes("number").columns
+        cats = data_process.select_dtypes("object").columns
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ('num', RobustScaler(), nums), 
+                ('cat', OneHotEncoder(categories=[["H", "L", "M"]]), cats) 
+            ], verbose_feature_names_out=False)
         # Use the preprocessor to fit the data, maintaining the columns names
-        X_train_preprocessed = preprocessor.fit_transform(X_train)
-        X_train_preprocessed = pd.DataFrame(X_train_preprocessed, columns=preprocessor.get_feature_names_out())
-        X_test_preprocessed = preprocessor.transform(X_test)
-        X_test_preprocessed = pd.DataFrame(X_test_preprocessed, columns=preprocessor.get_feature_names_out())
-
-        return X_train_preprocessed, X_test_preprocessed, y_train, y_test
+        data_preprocessed = preprocessor.fit_transform(data_process)
+        transformed_feature_names = preprocessor.get_feature_names_out()
+        data_preprocessed = pd.DataFrame(data_preprocessed, columns=transformed_feature_names)
+        X_train, X_test, y_train, y_test = train_test_split(data_preprocessed, data[target_name], test_size=test_size, random_state=42, stratify=data[target_name], shuffle=True)
+        if not os.path.exists("artifacts/preprocessor.pkl"):
+            self.save_preprocessor(preprocessor)
+        return X_train, X_test, y_train, y_test
 
     def initiate_model_trainer(self, train_test:tuple, experiment_name:str, use_smote:bool=False):
         """
