@@ -1,4 +1,4 @@
-# [Machine Predictive Maintenance Binary Classification](https://predmaintenanceapp.azurewebsites.net)
+# [Machine Predictive Maintenance Binary Classification](https://predictivemaintenanceapp.azurewebsites.net/)
 
 ![project header](images/header.png)
 
@@ -92,7 +92,7 @@ When adjusting the threshold, the model had only 15 false negatives and 19 false
 ```
 ## App Usage
 
-The easiest way to use the app is by accessing this link: <https://predmaintenanceapp.azurewebsites.net>
+The easiest way to use the app is by accessing this link: <https://predictivemaintenanceapp.azurewebsites.net/>
 However, since the deployment was made with the free plan from Azure, which only gives 60min of usage per day, the other way is through a Docker image. Here is a step by step guide on how to create this image and how to run the app locally:
 
 ### Step 1: Build Docker Image
